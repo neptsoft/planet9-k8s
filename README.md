@@ -251,7 +251,7 @@ kubectl scale deployment "$APP_INSTANCE_NAME-planet9" \
   --namespace "$NAMESPACE" --replicas=<new-replicas>
 ```
 
-By default, there are 1 replica set up. Increase the number of replicas as you
+By default, there are 2 replicas set up. Increase the number of replicas as you
 need more power.
 
 # Updating the app

@@ -17,7 +17,7 @@ spec:
       Low-code, rapid application development software that unifies the end-user experience and app development to integrate with any cloud, any backend and any architecture across mobile, desktop and offline environments.
     links:
     - description: 'User Guide: Planet9 TODO add link to github repo'
-      url: https://github.com/bergheim/planet9-k8s
+      url: https://github.com/neptsoft/planet9-k8s
     notes: |-
       # Expose the Planet9 service
 

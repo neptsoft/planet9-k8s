@@ -62,7 +62,7 @@ gcloud container clusters get-credentials "$CLUSTER" --zone "$ZONE"
 Clone this repo and the associated tools repo:
 
 ```shell
-git clone --recursive https://github.com/bergheim/planet9-k8s
+git clone --recursive https://github.com/neptsoft/planet9-k8s
 ```
 
 #### Install the Application resource definition

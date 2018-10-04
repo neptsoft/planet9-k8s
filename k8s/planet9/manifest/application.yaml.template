@@ -1,0 +1,132 @@
+---
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: "$APP_INSTANCE_NAME"
+  annotations:
+    kubernetes-engine.cloud.google.com/icon: >-
+      data:image/png;base64,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
+    marketplace.cloud.google.com/deploy-info: '{partner_id: "neptune-software", product_id: "planet9", partner_name: "Neptune Software"}'
+  labels:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+spec:
+  descriptor:
+    type: Planet9
+    version: '1.0.6'
+    description: |-
+      Low-code, rapid application development software that unifies the end-user experience and app development to integrate with any cloud, any backend and any architecture across mobile, desktop and offline environments.
+    links:
+    - description: 'User Guide: Planet9 TODO add link to github repo'
+      url: https://github.com/bergheim/planet9-k8s
+    notes: |-
+      # Expose the Planet9 service
+
+      ## Using the command line
+
+      By default, the service does not have an external IP. Make sure you have
+      [kubectl
+      installed](https://kubernetes.io/docs/tasks/tools/install-kubectl/), and
+      run the following command to expose an external IP:
+
+      ```shell
+      kubectl patch service/"$APP_INSTANCE_NAME-planet9-service" \
+        --namespace "$NAMESPACE" \
+        --patch '{"spec": {"type": "LoadBalancer"}}'
+      ```
+
+      Alternatively, you can forward the port to your local machine:
+      use `kubectl port-forward` and access the UI from your local machine.
+
+      Run the following command:
+
+      ```shell
+      kubectl port-forward -n $NAMESPACE \
+        svc/$APP_INSTANCE_NAME-planet9-service 8080
+      ```
+
+      Open Planet9 in your web browser with `http://localhost:8080/`.
+
+      ## Using the Google Console
+
+      1. On your project, navigate to `Kubernetes Engine` -> `Services`
+      2. Click on the installed service
+      3. Scroll down to the bottom, click `Port forwarding`
+      4. Click `Run in Cloud Shell`, enable it if you got the question, and
+      then execute the command (hit enter)
+      5. To the right on the bar over the shell, click the `Web preview` icon
+      and then `Preview on port 8080` (alternatively there should now be a
+      button to the right of `Port forwarding` which says `Open in web preview`
+
+      # Access Planet9
+
+      Get the external IP of the Planet9 service:
+
+      ```shell
+      SERVICE_IP=$(kubectl get service/$APP_INSTANCE_NAME-planet9-service \
+        --namespace $NAMESPACE \
+        --output jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+      echo "http://${SERVICE_IP}"
+      ```
+
+      Note that it might take some time for the external IP to be provisioned.
+
+      # Scale the cluster
+
+      To scale the cluster, use either a GKE UI (use the Scale option in the
+      StatefulSet details screen) or the following command:
+
+      ```shell
+      kubectl scale "$APP_INSTANCE_NAME-planet9" \
+        --namespace "$NAMESPACE" --replicas=<new-replicas>
+      ```
+
+      By default, there are 1 replica. To increase performance, you can increase
+      this number.
+
+      # Setting up SSL
+
+      By default, Planet9 does not expose its IP externally. This is because a
+      certificate is needed to set up a proper HTTPS connection.
+
+      To set this up, you would first start Planet9 normally, then forward the
+      port to your local machine (or use the web interface) as described above.
+      You can now log in to Planet9, and set up the certificates in Planet9 as
+      described TODO HERE.
+
+      Once this is done, remove the HTTP port and add the HTTPS port:
+
+      ```shell
+      kubectl patch service/"$APP_INSTANCE_NAME-planet9-service" \
+        --namespace "$NAMESPACE" \
+        --patch '{"spec": {"ports": [{"name": "https","port
+        ": 443, "targetPort": 8081}]}'
+      ```
+  info:
+  - name: Forward Planet9 port locally
+    value: POD_NAME="$(kubectl get pods -l "app.kubernetes.io/name=$APP_INSTANCE_NAME,app.kubernetes.io/component=planet9" -o jsonpath='{.items[0].metadata.name}')" kubectl port-forward $POD_NAME 8080 8080
+  - name: Planet9 UI URL
+    value: http://localhost:8080/
+  - name: Administrator username
+    value: admin
+  - name: Administrator password
+    type: Reference
+    valueFrom:
+      type: SecretKeyRef
+      secretKeyRef:
+        name: $APP_INSTANCE_NAME-secret
+        key: adminPassword
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+  componentKinds:
+  - group: apps/v1beta2
+    kind: Deployment
+  - group: v1
+    kind: Service
+  - group: apps/v1beta2
+    kind: StatefulSet
+  - group: v1
+    kind: Secret
+  - group: batch/v1
+    kind: Job

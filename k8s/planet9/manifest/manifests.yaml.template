@@ -1,0 +1,191 @@
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  name: $APP_INSTANCE_NAME-planet9-deployment
+  labels: &Planet9DeploymentLabels
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: planet9
+spec:
+  replicas: $REPLICAS
+  selector:
+    matchLabels: *Planet9DeploymentLabels
+  template:
+    metadata:
+      labels: *Planet9DeploymentLabels
+    spec:
+      initContainers:
+      - name: planet9-init
+        image: $IMAGE_POSTGRESQL
+        env:
+        - name: "PGPASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: $APP_INSTANCE_NAME-secret
+              key: psqlPassword
+        - name: "PGUSER"
+          value: "postgres"
+        - name: "PGHOST"
+          value: "$APP_INSTANCE_NAME-postgresql-svc"
+        - name: "NODE_ENV"
+          value: "production"
+        command: ["/bin/bash", "-c"]
+        args:
+          - echo starting;
+            while ! psql Planet9 -c "SELECT COUNT(*) FROM planet9_install_log"; do
+              echo "Waiting for the db";
+              sleep 5;
+            done;
+            echo "Checking if Planet9 db is initialized";
+            while [[ $(psql Planet9 -t -A -c "SELECT COUNT(*) FROM planet9_install_log") -eq "0" ]]; do
+              echo "Waiting for Planet9 to initialize";
+              sleep 5;
+            done;
+            echo done;
+      containers:
+      - name: planet9
+        image: $IMAGE_PLANET9
+        ports:
+        - containerPort: 8080
+        env:
+        - name: "DB_TYPE"
+          value: "postgresql"
+        - name: "DB_PSQL_HOST"
+          value: "$APP_INSTANCE_NAME-postgresql-svc"
+        - name: "DB_PSQL_PORT"
+          value: "5432"
+        - name: "DB_PSQL_USER"
+          value: "postgres"
+        - name: "DB_PSQL_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: $APP_INSTANCE_NAME-secret
+              key: psqlPassword
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: $APP_INSTANCE_NAME-secret
+  labels:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: planet9
+type: Opaque
+data:
+  adminPassword: $PLANET9_ADMIN_PASSWORD
+  psqlPassword: $PSQL_PASSWORD
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: $APP_INSTANCE_NAME-planet9-job
+  labels: &Planet9DeploymentLabels
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: planet9
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: planet9-init
+        image: $IMAGE_POSTGRESQL
+        env:
+        - name: "PGHOST"
+          value: "$APP_INSTANCE_NAME-postgresql-svc"
+        command: ["/bin/bash", "-c"]
+        args:
+          - echo starting;
+            while ! pg_isready -q; do
+              echo "The job is waiting for the db";
+              sleep 5;
+            done;
+            echo done;
+      containers:
+      - name: planet9-job
+        image: $IMAGE_PLANET9
+        command: ["./planet9-linux",  "--forceUpgrade"]
+        env:
+        - name: "DB_TYPE"
+          value: "postgresql"
+        - name: "DB_PSQL_HOST"
+          value: "$APP_INSTANCE_NAME-postgresql-svc"
+        - name: "DB_PSQL_PORT"
+          value: "5432"
+        - name: "DB_PSQL_USER"
+          value: "postgres"
+        - name: "DB_PSQL_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: $APP_INSTANCE_NAME-secret
+              key: psqlPassword
+        - name: "INITIAL_ADMIN_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: $APP_INSTANCE_NAME-secret
+              key: adminPassword
+      restartPolicy: Never
+  backoffLimit: 4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $APP_INSTANCE_NAME-planet9-service
+  labels:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: planet9
+spec:
+  selector:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: planet9
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: ClusterIP
+---
+kind: StatefulSet
+apiVersion: apps/v1beta2
+metadata:
+  name: $APP_INSTANCE_NAME-planet9-db-psql
+  labels: &PostgreSQLDeploymentLabels
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: postgresql-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels: *PostgreSQLDeploymentLabels
+  serviceName: $APP_INSTANCE_NAME-postgresql-svc
+  template:
+    metadata:
+      labels: *PostgreSQLDeploymentLabels
+    spec:
+      containers:
+      - name: postgresql-server
+        image: $IMAGE_POSTGRESQL
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: "PGDATA"
+          value: "/var/lib/postgresql/data/pgdata"
+        - name: "POSTGRES_DB"
+          value: "Planet9"
+        - name: "POSTGRES_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: $APP_INSTANCE_NAME-secret
+              key: psqlPassword
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: $APP_INSTANCE_NAME-postgresql-svc
+  labels:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: postgresql-server
+spec:
+  ports:
+  - name: postgres
+    port: 5432
+  selector:
+    app.kubernetes.io/name: "$APP_INSTANCE_NAME"
+    app.kubernetes.io/component: postgresql-server
+  type: ClusterIP

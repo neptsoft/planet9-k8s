@@ -1,0 +1,44 @@
+application_api_version: v1beta1
+properties:
+  APP_INSTANCE_NAME:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  NAMESPACE:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  IMAGE_PLANET9:
+    type: string
+    default: $REGISTRY:$TAG
+    x-google-marketplace:
+      type: IMAGE
+  IMAGE_POSTGRESQL:
+    type: string
+    default: $REGISTRY/postgresql:$TAG
+    x-google-marketplace:
+      type: IMAGE
+  REPLICAS:
+    type: integer
+    title: Replicas
+    description: The number of Pod replicas
+    default: 2
+    minimum: 1
+    maximum: 11
+  PLANET9_ADMIN_PASSWORD:
+    type: string
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 12
+  PSQL_PASSWORD:
+    type: string
+    x-google-marketplace:
+      type: GENERATED_PASSWORD
+      generatedPassword:
+        length: 12
+required:
+- APP_INSTANCE_NAME
+- NAMESPACE
+- IMAGE_PLANET9
+- REPLICAS

@@ -242,7 +242,7 @@ curl "${PLANET9_URL}"
 
 In the response, you should get the initial HTML for the login screen for Planet9:
 
-### Scale the cluster
+# Scale the cluster
 
 Scale the number of master node replicas by the following command:
 
